@@ -39,8 +39,8 @@ int main( int argc, char * argv[])
 
     /** Image type */
     //typedef itk::RGBPixel<float> PixelType;
-    //typedef float PixelType;
-    typedef itk::VariableLengthVector<float> PixelType;
+    typedef float PixelType;
+    //typedef itk::VariableLengthVector<float> PixelType;
 
     if(dim == 2)
     {

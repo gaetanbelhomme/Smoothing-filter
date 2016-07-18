@@ -1,0 +1,60 @@
+﻿#ifndef SMOOTHING_FILTER_H
+#define SMOOTHING_FILTER_H
+
+#include "../../ITK/Modules/Core/Common/include/itkImage.h"
+#include "../../ITK/Modules/Core/Common/include/itkImageToImageFilter.h"
+#include "../../ITK/Modules/Core/Common/include/itkImageRegionConstIterator.h"
+#include "../../ITK/Modules/Core/Common/include/itkImageRegionIterator.h"
+
+
+template< typename TImage>
+class SmoothingFilter: public itk::ImageToImageFilter< TImage, TImage >
+{
+
+public:
+
+    /** Standard class typedefs. */
+    typedef SmoothingFilter                                 Self;
+    typedef itk::ImageToImageFilter< TImage, TImage >       SuperClass;
+    typedef itk::SmartPointer<Self>                         Pointer;
+    typedef itk::SmartPointer<const Self>                   ConstPointer;
+    typedef itk::ImageRegionIterator<TImage>                Iterator;
+    typedef itk::ImageRegionConstIterator<TImage>           ConstIterator;
+
+    typedef typename TImage::PixelType                      TPixel;
+    typedef typename TImage::IndexType                      TIndex;
+    typedef typename TImage::ConstPointer                   ImageConstPointer;
+    typedef typename TImage::Pointer                        ImagePointer;
+    typedef typename TImage::SizeType                       SizeType;
+
+
+    /** Method for creation through the object factory  */
+    itkNewMacro(Self)
+
+    /** Run-time type information (and related methods) */
+    itkTypeMacro(SmoothingFilter, ImageToImageFilter)
+
+    /** Number of Neighbours */
+    int NbNeighbours;
+
+    /** Does the real work */
+    void GenerateData();
+
+protected:
+
+    SmoothingFilter();
+
+private:
+
+    bool IsInBundarie(TIndex PixelIndex, ImageConstPointer input, TIndex limit);
+
+    TPixel Neighbours_4(ImageConstPointer input, ConstIterator inputIterator);
+    TPixel Neighbours_8(ImageConstPointer input, ConstIterator inputIterator);
+
+
+};
+
+
+
+
+#endif

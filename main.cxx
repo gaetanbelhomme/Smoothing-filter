@@ -4,6 +4,7 @@
 
 #include "../../ITK/Modules/Bridge/VtkGlue/include/QuickView.h"
 #include "../../ITK/Modules/Core/Common/include/itkRGBPixel.h"
+#include "itkConstantBoundaryCondition.h"
 
 
 int main( int argc, char * argv[])
@@ -38,7 +39,8 @@ int main( int argc, char * argv[])
 
     /** Image type */
     //typedef itk::RGBPixel<float> PixelType;
-    typedef float PixelType;
+    //typedef float PixelType;
+    typedef itk::VariableLengthVector<float> PixelType;
 
     if(dim == 2)
     {
@@ -67,7 +69,7 @@ int main( int argc, char * argv[])
 
         /** Filter  */
         filter->SetInput(reader->GetOutput());
-        filter->GenerateData();
+        filter->Update();
 
         /** Writer  */
         std::string name = "_out";
@@ -75,10 +77,10 @@ int main( int argc, char * argv[])
         writer->SetFileName(argv[1] + name + exten);
         writer->Update();
 
-        QuickView viewer;
-        viewer.AddImage(reader->GetOutput(), true, "Original Image");
-        viewer.AddImage(filter->GetOutput(), true, "Filtered Image");
-        viewer.Visualize();
+//        QuickView viewer;
+//        viewer.AddImage(reader->GetOutput(), true, "Original Image");
+//        viewer.AddImage(filter->GetOutput(), true, "Filtered Image");
+//        viewer.Visualize();
     }
 
 
@@ -97,20 +99,17 @@ int main( int argc, char * argv[])
         FilterType::Pointer filter = FilterType::New();
 
         /** Read    */
-        //reader->SetFileName(argv[1]);
         reader->SetFileName(argv[1]+exten);
         reader->Update();
 
         /** Filter  */
         filter->SetInput(reader->GetOutput());
-        filter->GenerateData();
-        //filter->Update();
+        filter->Update();
 
         /** Writer  */
         std::string name = "_out";
         writer->SetInput(filter->GetOutput());
         writer->SetFileName(argv[1] + name + exten);
-        //writer->SetFileName("yo.nrrd");
         writer->Update();
     }
 

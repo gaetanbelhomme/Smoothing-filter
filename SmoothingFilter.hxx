@@ -52,7 +52,7 @@ void SmoothingFilter<TImage>::GenerateData(){
 
             /** Mean - 8 Neighbours */
             if(NbNeighbours == 8)
-                mean = Neighbours_8(input, inputIterator);
+                //mean = Neighbours_8(input, inputIterator);
 
 
 

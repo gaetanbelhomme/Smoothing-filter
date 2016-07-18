@@ -37,12 +37,14 @@ public:
     /** Number of Neighbours */
     int NbNeighbours;
 
-    /** Does the real work */
-    void GenerateData();
+
 
 protected:
 
     SmoothingFilter();
+
+    /** Does the real work */
+    virtual void GenerateData();
 
 private:
 

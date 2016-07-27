@@ -35,8 +35,6 @@ void SmoothingFilter<TImage>::GenerateData(){
     /** Init mean, mean of 4 neighbours and current pixel */
     TPixel mean;
 
-
-
     /** For all the Image */
     while(!inputIterator.IsAtEnd())
     {
@@ -48,14 +46,16 @@ void SmoothingFilter<TImage>::GenerateData(){
 
             /** Mean - 4 Neighbours */
             if(NbNeighbours == 4)
+            {
                 mean = Neighbours_4(input, inputIterator);
+            }
 
             /** Mean - 8 Neighbours */
             if(NbNeighbours == 8)
+            {
+
                 //mean = Neighbours_8(input, inputIterator);
-
-
-
+            }
 
             outputIterator.Set(mean);
 
@@ -79,7 +79,7 @@ void SmoothingFilter<TImage>::GenerateData(){
 template<typename TImage>
 typename TImage::PixelType SmoothingFilter<TImage>::Neighbours_4(ImageConstPointer input, ConstIterator inputIterator)
 {
-    TPixel mean = input->GetPixel(inputIterator.GetIndex());
+    int mean = input->GetPixel(inputIterator.GetIndex());
     TIndex PixelIndexCurrent;
     int count =1;
 
@@ -100,12 +100,11 @@ typename TImage::PixelType SmoothingFilter<TImage>::Neighbours_4(ImageConstPoint
         PixelIndexCurrent[i] = inputIterator.GetIndex()[i]+1;
 
         mean = (mean + input->GetPixel(PixelIndexCurrent));
-
         count += 2;
     }
     //mean = mean/((float)(1 + 2*inputIterator.GetIndex().GetIndexDimension()));
     //std::cout<<"coutc"<<(float)count<<std::endl;
-    mean = mean/(float)count;
+    mean = mean/count;
 
     return mean;
 
@@ -142,10 +141,6 @@ typename TImage::PixelType SmoothingFilter<TImage>::Neighbours_8(ImageConstPoint
 
 }
 
-
-
-
-
 template<typename TImage>
 bool SmoothingFilter<TImage>::IsInBundarie(TIndex PixelIndex, ImageConstPointer input, TIndex limit)
 {
@@ -153,7 +148,9 @@ bool SmoothingFilter<TImage>::IsInBundarie(TIndex PixelIndex, ImageConstPointer 
     for(int i = 0; i<PixelIndex.GetIndexDimension(); i++)
     {
         if(PixelIndex[i]==0 || PixelIndex[i]== limit[i]-1)
+        {
             return true;
+        }
     }
     return false;
 }

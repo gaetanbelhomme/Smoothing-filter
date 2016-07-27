@@ -1,10 +1,15 @@
 #include "SmoothingFilter.hxx"
-#include "../../ITK/Modules/IO/ImageBase/include/itkImageFileReader.h"
-#include "../../ITK/Modules/IO/ImageBase/include/itkImageFileWriter.h"
 
-#include "../../ITK/Modules/Bridge/VtkGlue/include/QuickView.h"
-#include "../../ITK/Modules/Core/Common/include/itkRGBPixel.h"
-#include "itkConstantBoundaryCondition.h"
+
+
+#include "itkImage.h"
+#include "itkImageToImageFilter.h"
+#include "itkImageRegionConstIterator.h"
+#include "itkImageRegionIterator.h"
+#include "itkImageFileReader.h"
+#include "itkImageFileWriter.h"
+#include "QuickView.h"
+
 
 
 int main( int argc, char * argv[])
@@ -39,7 +44,7 @@ int main( int argc, char * argv[])
 
     /** Image type */
     //typedef itk::RGBPixel<float> PixelType;
-    typedef float PixelType;
+    typedef unsigned char PixelType;
     //typedef itk::VariableLengthVector<float> PixelType;
 
     if(dim == 2)

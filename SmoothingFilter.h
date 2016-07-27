@@ -1,10 +1,10 @@
 ﻿#ifndef SMOOTHING_FILTER_H
 #define SMOOTHING_FILTER_H
 
-#include "../../ITK/Modules/Core/Common/include/itkImage.h"
-#include "../../ITK/Modules/Core/Common/include/itkImageToImageFilter.h"
-#include "../../ITK/Modules/Core/Common/include/itkImageRegionConstIterator.h"
-#include "../../ITK/Modules/Core/Common/include/itkImageRegionIterator.h"
+#include "itkImage.h"
+#include "itkImageToImageFilter.h"
+#include "itkImageRegionConstIterator.h"
+#include "itkImageRegionIterator.h"
 
 
 template< typename TImage>

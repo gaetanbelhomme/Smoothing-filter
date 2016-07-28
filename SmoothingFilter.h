@@ -5,7 +5,7 @@
 #include "itkImageToImageFilter.h"
 #include "itkImageRegionConstIterator.h"
 #include "itkImageRegionIterator.h"
-
+#include "itkRGBPixel.h"
 
 template< typename TImage>
 class SmoothingFilter: public itk::ImageToImageFilter< TImage, TImage >

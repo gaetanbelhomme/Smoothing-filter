@@ -11,7 +11,7 @@ SmoothingFilter<TImage>::SmoothingFilter(): NbNeighbours(4)
 {}
 
 
-
+/** Process the smooth filter **/
 template<typename TImage>
 void SmoothingFilter<TImage>::GenerateData(){
 
@@ -22,10 +22,6 @@ void SmoothingFilter<TImage>::GenerateData(){
     output->Graft(this->GetInput());
 
 
-
-    /*output->SetRegions(input->GetLargestPossibleRegion());
-    output->Allocate();*/
-
     /** Pointers and iterators link */
     Iterator outputIterator(output, output->GetRequestedRegion());
     ConstIterator inputIterator(input, input->GetRequestedRegion());
@@ -34,6 +30,8 @@ void SmoothingFilter<TImage>::GenerateData(){
     TIndex limit = inputIterator.GetIndex()+size;
     /** Init mean, mean of 4 neighbours and current pixel */
     TPixel mean;
+
+
 
     /** For all the Image */
     while(!inputIterator.IsAtEnd())
@@ -46,15 +44,12 @@ void SmoothingFilter<TImage>::GenerateData(){
 
             /** Mean - 4 Neighbours */
             if(NbNeighbours == 4)
-            {
                 mean = Neighbours_4(input, inputIterator);
-            }
 
             /** Mean - 8 Neighbours */
             if(NbNeighbours == 8)
             {
-
-                //mean = Neighbours_8(input, inputIterator);
+                mean = Neighbours_8(input, inputIterator);
             }
 
             outputIterator.Set(mean);
@@ -75,36 +70,41 @@ void SmoothingFilter<TImage>::GenerateData(){
 
 
 
-
+/** Mean for 4 neighbours **/
 template<typename TImage>
 typename TImage::PixelType SmoothingFilter<TImage>::Neighbours_4(ImageConstPointer input, ConstIterator inputIterator)
 {
-    int mean = input->GetPixel(inputIterator.GetIndex());
+    itk::RGBPixel<float> mean = input->GetPixel(inputIterator.GetIndex());
+    if(TImage::GetImageDimension()==2)
+        itk::RGBPixel<int> mean = input->GetPixel(inputIterator.GetIndex());
+
+
     TIndex PixelIndexCurrent;
     int count =1;
 
     for(unsigned int i = 0; i<inputIterator.GetIndex().GetIndexDimension(); i++)
     {
+        for(unsigned int j = 0; j<3; j++)
+        {
+
+            PixelIndexCurrent = inputIterator.GetIndex();
+
+            /** PixelIndex - 1 */
+            PixelIndexCurrent[i] = inputIterator.GetIndex()[i]-1;
+
+            mean[j] = (mean[j] + input->GetPixel(PixelIndexCurrent)[j]);
 
 
+            /** PixelIndex + 1 */
+            PixelIndexCurrent[i] = inputIterator.GetIndex()[i]+1;
 
-        PixelIndexCurrent = inputIterator.GetIndex();
+            mean[j] = (mean[j] + input->GetPixel(PixelIndexCurrent)[j]);
+        }
 
-        /** PixelIndex - 1 */
-        PixelIndexCurrent[i] = inputIterator.GetIndex()[i]-1;
-
-        mean = (mean + input->GetPixel(PixelIndexCurrent));
-
-
-        /** PixelIndex + 1 */
-        PixelIndexCurrent[i] = inputIterator.GetIndex()[i]+1;
-
-        mean = (mean + input->GetPixel(PixelIndexCurrent));
         count += 2;
     }
-    //mean = mean/((float)(1 + 2*inputIterator.GetIndex().GetIndexDimension()));
-    //std::cout<<"coutc"<<(float)count<<std::endl;
-    mean = mean/count;
+    for(unsigned k = 0; k<3; k++)
+        mean[k] = mean[k]/(float)count;
 
     return mean;
 
@@ -112,13 +112,12 @@ typename TImage::PixelType SmoothingFilter<TImage>::Neighbours_4(ImageConstPoint
 
 
 
-
-
-
+/** Mean for 8 neighbours **/
 template<typename TImage>
 typename TImage::PixelType SmoothingFilter<TImage>::Neighbours_8(ImageConstPointer input, ConstIterator inputIterator)
 {
-    TPixel  mean=0;
+    itk::RGBPixel<int>  mean;
+    mean[0] = 0,mean[1] = 0, mean[2] = 0;
     TIndex PixelIndexCurrent;
     PixelIndexCurrent = inputIterator.GetIndex();
 
@@ -130,17 +129,26 @@ typename TImage::PixelType SmoothingFilter<TImage>::Neighbours_8(ImageConstPoint
         for(int y = -1; y <= 1; y ++)
         {
             PixelIndexCurrent[1] = inputIterator.GetIndex()[1] + y;
-            if(mean == 0)
+            if(mean[0] == 0 && mean[1] == 0 && mean[3] == 0)
                 mean = input->GetPixel(PixelIndexCurrent);
             else
-                mean = (mean + input->GetPixel(PixelIndexCurrent));
+            {
+                for(unsigned int j = 0; j<3; j++)
+                    mean[j] = (mean[j] + input->GetPixel(PixelIndexCurrent)[j]);
+            }
+
         }
     }
-    mean = mean/7;
+    mean[0] = mean[0]/7;
+    mean[1] = mean[1]/7;
+    mean[2] = mean[2]/7;
     return mean;
 
 }
 
+
+
+/** If the current pixel is on bundaries (index = 0 or index = image.size-1), we set it at imageinput value **/
 template<typename TImage>
 bool SmoothingFilter<TImage>::IsInBundarie(TIndex PixelIndex, ImageConstPointer input, TIndex limit)
 {
@@ -148,14 +156,10 @@ bool SmoothingFilter<TImage>::IsInBundarie(TIndex PixelIndex, ImageConstPointer 
     for(int i = 0; i<PixelIndex.GetIndexDimension(); i++)
     {
         if(PixelIndex[i]==0 || PixelIndex[i]== limit[i]-1)
-        {
             return true;
-        }
     }
     return false;
 }
-
-
 
 
 

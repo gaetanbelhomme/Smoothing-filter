@@ -1,7 +1,5 @@
 #include "SmoothingFilter.hxx"
 
-
-
 #include "itkImage.h"
 #include "itkImageToImageFilter.h"
 #include "itkImageRegionConstIterator.h"
@@ -9,6 +7,26 @@
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
 #include "QuickView.h"
+#include "itkRGBPixel.h"
+
+
+
+/** Find extension */
+std::string SetExten(std::string file)
+{
+    int pos = file.find('.',2);
+    std::string filename = file.substr(0,pos);
+    std::string exten = file.substr(pos,file.size());
+    return exten;
+
+}
+
+/** Set output filename */
+std::string SetOutputName(std::string exten, std::string name){
+    std::string outputname = name + "_out" + exten;
+    return outputname;
+}
+
 
 
 
@@ -21,34 +39,37 @@ int main( int argc, char * argv[])
         return EXIT_FAILURE;
     }
 
-
-
     /** Get Dimension & extension */
-    //Dimension
-    int dim = 0;
-
-    do{
-        std::cout<< "Dimension ? "<<std::endl;
-        std::cin>>dim;
-
-    }while(dim >3 || dim <2);
-
 
     //Extension
-    std::string exten;
-    std::cout<<"extension ?"<<std::endl;
-    std::cin>>exten;
+    std::string exten = SetExten(argv[1]);
+
+    //Set output filename
+    std::string OutputFile = SetOutputName(exten, argv[2]);
 
 
+    //Dimension
+    int dim = 2;
+
+    if(exten == ".jpeg" || exten == ".jpg" || exten == ".png")
+        dim = 2;
+    else if(exten == ".mha" || exten == ".mhd" || exten == ".nrrd")
+        dim = 3;
+    else
+    {
+        do{
+            std::cout<< "Dimension ? "<<std::endl;
+            std::cin>>dim;
+
+        }while(dim >3 || dim <2);
+    }
 
 
     /** Image type */
-    //typedef itk::RGBPixel<float> PixelType;
-    typedef unsigned char PixelType;
-    //typedef itk::VariableLengthVector<float> PixelType;
 
     if(dim == 2)
     {
+        typedef itk::RGBPixel<unsigned char> PixelType;
         const unsigned int Dimension = 2;
 
         typedef itk::Image<PixelType, Dimension>        ImageType;
@@ -69,7 +90,7 @@ int main( int argc, char * argv[])
         }while(filter->NbNeighbours!=4 && filter->NbNeighbours!=8);
 
         /** Read    */
-        reader->SetFileName(argv[1]+exten);
+        reader->SetFileName(argv[1]);
         reader->Update();
 
         /** Filter  */
@@ -77,9 +98,8 @@ int main( int argc, char * argv[])
         filter->Update();
 
         /** Writer  */
-        std::string name = "_out";
         writer->SetInput(filter->GetOutput());
-        writer->SetFileName(argv[1] + name + exten);
+        writer->SetFileName(OutputFile);
         writer->Update();
 
 //        QuickView viewer;
@@ -92,6 +112,7 @@ int main( int argc, char * argv[])
 
     else
     {
+        typedef itk::RGBPixel<float> PixelType;
         const unsigned int Dimension = 3;
 
         typedef itk::Image<PixelType, Dimension>        ImageType;
@@ -104,7 +125,7 @@ int main( int argc, char * argv[])
         FilterType::Pointer filter = FilterType::New();
 
         /** Read    */
-        reader->SetFileName(argv[1]+exten);
+        reader->SetFileName(argv[1]);
         reader->Update();
 
         /** Filter  */
@@ -112,9 +133,8 @@ int main( int argc, char * argv[])
         filter->Update();
 
         /** Writer  */
-        std::string name = "_out";
         writer->SetInput(filter->GetOutput());
-        writer->SetFileName(argv[1] + name + exten);
+        writer->SetFileName(OutputFile);
         writer->Update();
     }
 
